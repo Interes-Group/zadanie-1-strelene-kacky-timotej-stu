@@ -12,13 +12,14 @@ public class OneClassToRuleThemAll
 
     Scanner input = new Scanner( System.in );
 
-    int pocet_hracov;
+    private int pocet_hracov, pocet_hracov_v_hre;
 
     public OneClassToRuleThemAll()
     {
         System.out.print("Zadaj pocet hracov [1-6]: ");
+        pocet_hracov = (vybratCislo(6)+1);
+        pocet_hracov_v_hre = pocet_hracov;
 
-        pocet_hracov = input.nextInt();
         System.out.println(" ");
         System.out.println(" ");
 
@@ -39,12 +40,20 @@ public class OneClassToRuleThemAll
             {
                 hrac_na_tahu = 0;
             }
-        }while (true);
+        }while (pocet_hracov_v_hre > 1);
+
+        for(int i = 0; i < pocet_hracov; i++)
+        {
+            if (hrac[i].getZivoty() > 0)
+                System.out.println("Hrac-" + (i+1) + "je vitaz!");
+        }
     }
 
     public void koloHry(int hrac_na_tahu)
     {
         int vybrana_karta;
+
+        int vlastnik_kacky;
 
         System.out.println(" ");
         System.out.println(" ");
@@ -57,7 +66,7 @@ public class OneClassToRuleThemAll
         hrac[hrac_na_tahu].vypisRuky();
 
         System.out.print("Vyber kartu [1-3]: ");
-        vybrana_karta = (input.nextInt()-1);
+        vybrana_karta = vybratCislo(3);
 
         System.out.println(" ");
         System.out.println("Pouzil si kartu: " + hrac[hrac_na_tahu].vypisatKartu(vybrana_karta));
@@ -66,7 +75,13 @@ public class OneClassToRuleThemAll
 
         if(mrtva_kacka != null)
         {
-            hrac[vlastnikKacky(mrtva_kacka)].odcitanieZivotov();//odobrat zivot vlastnikovi kacky
+            vlastnik_kacky = vlastnikKacky(mrtva_kacka);
+            hrac[vlastnik_kacky].odcitanieZivotov();//odobrat zivot vlastnikovi kacky
+
+            if (hrac[vlastnik_kacky].getZivoty() == 0)
+            {
+                pocet_hracov_v_hre--;
+            }
         }
 
         doplnitKartu(hrac_na_tahu);
@@ -88,24 +103,24 @@ public class OneClassToRuleThemAll
 
     public int vlastnikKacky(Kacka mrtva_kacka)
     {
-        int vlastnik = 0;
+        int vlastnik;
 
-        String mrtva_kacka_string = toString(mrtva_kacka);
+        switch (toString(mrtva_kacka))
+        {
+            case "Kacka_Hraca-2":   vlastnik = 1;
+                                    break;
+            case "Kacka_Hraca-3":   vlastnik = 2;
+                                    break;
+            case "Kacka_Hraca-4":   vlastnik = 3;
+                                    break;
+            case "Kacka_Hraca-5":   vlastnik = 4;
+                                    break;
+            case "Kacka_Hraca-6":   vlastnik = 5;
+                                    break;
+            default:                vlastnik = 0;
+        }
 
-        if(mrtva_kacka_string.equals("Kacka_Hraca-1"))
-            vlastnik = 0;
-        else if(mrtva_kacka_string.equals("Kacka_Hraca-2"))
-            vlastnik = 1;
-        else if(mrtva_kacka_string.equals("Kacka_Hraca-3"))
-            vlastnik = 2;
-        else if(mrtva_kacka_string.equals("Kacka_Hraca-4"))
-            vlastnik = 3;
-        else if(mrtva_kacka_string.equals("Kacka_Hraca-5"))
-            vlastnik = 4;
-        else if(mrtva_kacka_string.equals("Kacka_Hraca-6"))
-            vlastnik = 5;
-
-        System.out.println("Mrtva Kacka: " + mrtva_kacka_string);
+        System.out.println("Mrtva Kacka: " + toString(mrtva_kacka));
 
         return vlastnik;
     }
@@ -116,36 +131,45 @@ public class OneClassToRuleThemAll
 
         Kacka mrtva_kacka = null;
 
-        if(pouzita_karta.equals("Zamierit"))
+        switch (pouzita_karta)
         {
-            System.out.println("Na aku poziciu chces zamierit [1-6]:");
-            hraciePole.zamierit(input.nextInt()-1);
+            case "Zamierit":        System.out.println("Na aku poziciu chces zamierit [1-6]:");
+                                    hraciePole.zamierit(vybratCislo(6));
+                                    break;
+            case "Vystrelit":       System.out.println("Na aku poziciu chces vystrelit [1-6]:");
+                                    hraciePole.vystrelit(vybratCislo(6));
+                                    break;
+            case "DivokyBill":      System.out.println("Na aku poziciu chces pouzit Divokeho Billa [1-6]:");
+                                    mrtva_kacka = hraciePole.divokyBill(vybratCislo(6));
+                                    break;
+            case "KacaciPochod":    hraciePole.kacaciPochod();
+                                    break;
+            case "TurboKacka":      System.out.println("Ktora kacka je TURBOKACKA [1-6]:");
+                                    hraciePole.turboKacka(vybratCislo(6));
+                                    break;
+            case "Rosambo":         hraciePole.rosambo();
+                                    break;
+            case "KacaciTanec":     hraciePole.kacaciTanec();
+                                    break;
+            default:                mrtva_kacka = null;
         }
-        else if(pouzita_karta.equals("Vystrelit"))
-        {
-            System.out.println("Na aku poziciu chces vystrelit [1-6]:");
-            mrtva_kacka = hraciePole.vystrelit(input.nextInt()-1);
-        }
-        else if(pouzita_karta.equals("DivokyBill"))
-        {
-            System.out.println("Na aku poziciu chces pouzit Divokeho Billa [1-6]:");
-            mrtva_kacka = hraciePole.divokyBill(input.nextInt()-1);
-        }
-        else if(pouzita_karta.equals("KacaciPochod"))
-            hraciePole.kacaciPochod();
-        else if(pouzita_karta.equals("TurboKacka"))
-        {
-            System.out.println("Ktora kacka je TURBOKACKA [1-6]:");
-            hraciePole.turboKacka(input.nextInt()-1);
-        }
-        else if(pouzita_karta.equals("Rosambo"))
-            hraciePole.rosambo();
-        else if(pouzita_karta.equals("KacaciTanec"))
-            hraciePole.kacaciTanec();
 
         balik.vratitDoBaliku(hrac[hrac_na_tahu].pouzitKartu(vybrana_karta));
 
         return mrtva_kacka;
+    }
+
+    public int vybratCislo(int max)
+    {
+        int vybrana_pozicia = (input.nextInt()-1);
+
+        while (vybrana_pozicia <  0 || vybrana_pozicia > (max-1))
+        {
+            System.out.println("Neplatne cislo! Vyber cislo [1-" + max +"]:");
+            vybrana_pozicia = (input.nextInt()-1);
+        }
+
+        return vybrana_pozicia;
     }
 
     public void doplnitKartu(int hrac_na_tahu)

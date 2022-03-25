@@ -7,8 +7,6 @@ public class HraciePole extends BalikKaciek
 {
     private ArrayList<Kacka> kacky_na_poli;
 
-    private ArrayList<Kacka> turbokacka;
-
     private int[] zamierene = {0,0,0,0,0,0};
 
     private final int pocetPolicok = 6;
@@ -16,8 +14,6 @@ public class HraciePole extends BalikKaciek
     public HraciePole()
     {
         kacky_na_poli = new ArrayList<>();
-
-        turbokacka = new ArrayList<>();
     }
 
     public void vypisHernehoPola()
@@ -102,17 +98,7 @@ public class HraciePole extends BalikKaciek
 
     public void turboKacka(int pozicia)
     {
-        turbokacka.add(kacky_na_poli.remove(pozicia));
-
-        for (int i = 0; i < (pocetPolicok-1); i++)
-        {
-            turbokacka.add(kacky_na_poli.remove(0));
-        }
-
-        for (int i = 0; i < pocetPolicok; i++)
-        {
-            kacky_na_poli.add(turbokacka.remove(0));
-        }
+        kacky_na_poli.add(0, kacky_na_poli.remove(pozicia));
     }
 
     public void rosambo()
